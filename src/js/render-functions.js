@@ -1,12 +1,11 @@
-// Описаний у документації
 import iziToast from 'izitoast';
-// Додатковий імпорт стилів
+
 import 'izitoast/dist/css/iziToast.min.css';
-//імпорт функці з другого файлу
+
 import { imageSearch } from './pixabay-api';
-// Описаний у документації
+
 import SimpleLightbox from 'simplelightbox';
-// Додатковий імпорт стилів
+
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const form = document.querySelector('#form');
@@ -19,7 +18,6 @@ let pageNum;
 let currentQuery;
 let renderCount = 0;
 
-//використовую бібліотеку
 const lightbox = new SimpleLightbox('.gallery>.item-gallery a', {
   //* options */
   backgroundColor: '#EF4040',
@@ -27,10 +25,8 @@ const lightbox = new SimpleLightbox('.gallery>.item-gallery a', {
   captionDelay: 250,
 });
 
-//навішую подію
 form.addEventListener('submit', searchImages);
 
-//функція яка відмальовує сторінку
 function addImagesMarcup(
   largeImageURL,
   webformatURL,
@@ -67,32 +63,26 @@ function addImagesMarcup(
 `;
   gallery.insertAdjacentHTML('beforeend', markupItem);
 
-  //scrolling
   if (renderCount >= 1) {
-    // get height of 1 card
     const galleryItemHeight = document
       .querySelector('.item-gallery')
       .getBoundingClientRect().height;
-    // smooth scrolling on height*2
+
     window.scrollBy({ top: galleryItemHeight * 2, behavior: 'smooth' });
   }
 }
 
-//обробка кліка
 function searchImages(event) {
   event.preventDefault();
-  //тут очищаю перед заповненням
+
   gallery.innerHTML = '';
-  //обнулення на новий запит
+
   renderCount = 0;
 
-  //зберігаю значення інпута
   currentQuery = form.elements.input.value.trim();
 
-  //очистка інпута
   form.elements.input.value = '';
 
-  //перевірка інпута
   if (currentQuery === '') {
     iziToast.error({
       title: 'Error',
@@ -103,20 +93,18 @@ function searchImages(event) {
       progressBarColor: '#B51B1B',
       position: 'topRight',
     });
-    //якщо пусте значення
+
     btnMoreImages.classList.add('is-hidden');
 
     return;
   }
 
-  //якщо повторний запит після помилки - закрив кнопку
   btnMoreImages.classList.add('is-hidden');
 
-  //включаю лоадер
   loader.classList.add('spinner');
-  //тут перша сторінка
+
   pageNum = 1;
-  //пішла обробка
+
   imageSearch(currentQuery, pageNum)
     .then(response => {
       if (response.hits.length === 0) {
@@ -140,11 +128,11 @@ function searchImages(event) {
           item.downloads
         )
       );
-      //включаю кнопку
+
       btnMoreImages.classList.remove('is-hidden');
-      //метод рефреш
+
       lightbox.refresh();
-      //коли пошук був успішним
+
       renderCount++;
     })
     .catch(error => console.log(error))
@@ -174,14 +162,12 @@ async function addMoreImages() {
         item.downloads
       )
     );
-    //метод рефреш
+
     lightbox.refresh();
 
-    //рахую тотал
     const totalHits = response.totalHits || 0;
     const totalPages = Math.ceil(totalHits / 15); // Розраховуємо загальну кількість сторінок
 
-    //виключаю лоадер
     btnMoreImages_loader.classList.add('is-hidden');
     if (pageNum >= totalPages) {
       btnMoreImages.classList.add('is-hidden'); // Ховаємо кнопку "Load More", якщо це остання сторінка
